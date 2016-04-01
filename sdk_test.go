@@ -39,7 +39,7 @@ func (suite *TestSuite) SetupTest() {
 	}
 	urls := &ServiceEndpoints{}
 	urls.AuthServiceBaseURL = server.URL + defaultAuthBaseURL
-	urls.DataServiceBaseURL = defaultBaseURL
+	urls.DataServiceBaseURL = server.URL + defaultDataBaseURL
 	httpClient := &http.Client{Transport: transport}
 	sdk := New(urls, httpClient)
 	suite.Router = router

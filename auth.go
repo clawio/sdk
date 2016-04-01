@@ -25,7 +25,7 @@ func (s *authService) Authenticate(username, password string) (string, *codes.Re
 		return "", nil, err
 	}
 	authNResponse := &spec.AuthNResponse{}
-	resp, err := s.client.Do(req, authNResponse)
+	resp, err := s.client.Do(req, authNResponse, true)
 	if err != nil {
 		return "", resp, err
 	}
@@ -40,7 +40,7 @@ func (s *authService) Verify(token string) (*spec.Identity, *codes.Response, err
 		return nil, nil, err
 	}
 	verifyResponse := &spec.VerifyResponse{}
-	resp, err := s.client.Do(req, verifyResponse)
+	resp, err := s.client.Do(req, verifyResponse, true)
 	if err != nil {
 		return nil, resp, err
 	}

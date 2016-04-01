@@ -1,4 +1,4 @@
-package mock
+package mocks
 
 import (
 	"github.com/clawio/codes"
@@ -6,15 +6,15 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockSDK struct {
+type MockAuthService struct {
 	mock.Mock
 }
 
-func (m *MockSDK) Authenticate(username, password string) (string, *codes.Response, error) {
+func (m *MockAuthService) Authenticate(username, password string) (string, *codes.Response, error) {
 	args := m.Called(username, password)
 	return args.String(0), args.Get(1).(*codes.Response), args.Error(2)
 }
-func (m *MockSDK) Verify(token string) (*spec.Identity, *codes.Response, error) {
+func (m *MockAuthService) Verify(token string) (*spec.Identity, *codes.Response, error) {
 	args := m.Called(token)
-	return args.Get(0).(*spec.Identity), args.Get(1).(*codes.Response), args.Error(1)
+	return args.Get(0).(*spec.Identity), args.Get(1).(*codes.Response), args.Error(2)
 }

@@ -59,11 +59,10 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	return req, nil
 }
 
-/*
 // NewUploadRequest creates an upload request. A relative URL can be provided in
-// urlStr, in which case it is resolved relative to the UploadURL of the Client.
+// urlStr, in which case it is resolved relative to the BaseURL of the Client.
 // Relative URLs should always be specified without a preceding slash.
-func (c *Client) NewUploadRequest(urlStr string, reader io.Reader, size int64, mediaType string) (*http.Request, error) {
+func (c *Client) NewUploadRequest(urlStr string, reader io.Reader) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -86,22 +85,25 @@ func (c *Client) NewUploadRequest(urlStr string, reader io.Reader, size int64, m
 	}
 	return req, nil
 }
-*/
+
 // Do sends an API request and returns the API response.  The API response is
 // JSON decoded and stored in the value pointed to by v, or returned as an
 // error if an API error has occurred.  If v implements the io.Writer
 // interface, the raw response body will be written to v, without attempting to
 // first decode it.
-func (c *Client) Do(req *http.Request, v interface{}) (*codes.Response, error) {
+func (c *Client) Do(req *http.Request, v interface{}, close bool) (*codes.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
-		// Drain and close the body to let the Transport reuse the connection
-		io.Copy(ioutil.Discard, resp.Body)
-		resp.Body.Close()
+		if close == true {
+			// Drain and close the body to let the Transport reuse the connection
+			// This is valid when the response is decoded into v
+			io.Copy(ioutil.Discard, resp.Body)
+			resp.Body.Close()
+		}
 	}()
 
 	response := codes.NewResponse(resp)
