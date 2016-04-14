@@ -18,6 +18,7 @@ type Client struct {
 	UserAgent  string
 }
 
+// NewClient returns a new Client.
 func NewClient(baseURL string, httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
@@ -42,9 +43,8 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	var buf io.ReadWriter
 	if body != nil {
 		buf = new(bytes.Buffer)
-		err := json.NewEncoder(buf).Encode(body)
-		if err != nil {
-			return nil, err
+		if e := json.NewEncoder(buf).Encode(body); e != nil {
+			return nil, e
 		}
 	}
 

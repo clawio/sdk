@@ -7,6 +7,7 @@ import (
 	"github.com/clawio/codes"
 )
 
+// DataService is the interface that specifies the methods to call a data service.
 type DataService interface {
 	Upload(path string, r io.Reader, checksum string) (*codes.Response, error)
 	Download(path string) (io.Reader, *codes.Response, error)

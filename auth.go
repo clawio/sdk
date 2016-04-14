@@ -7,6 +7,7 @@ import (
 )
 
 type (
+	// AuthService is the interface that deals with the calls to an authentication service.
 	AuthService interface {
 		Authenticate(username, password string) (string, *codes.Response, error)
 		Verify(token string) (entities.User, *codes.Response, error)

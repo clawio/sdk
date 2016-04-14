@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// ServiceURLs contains the url of the different services of ClawIO.
+// ServiceEndpoints contains the url of the different services of ClawIO.
 type ServiceEndpoints struct {
 	AuthServiceBaseURL string
 	DataServiceBaseURL string
