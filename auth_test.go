@@ -11,91 +11,63 @@ func (suite *TestSuite) TestAuthenticate() {
 	suite.Router.HandleFunc(defaultAuthBaseURL+"authenticate", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, `{"token":"faketoken"}`)
+		fmt.Fprint(w, `{"token":"testtoken"}`)
 	})
-	token, _, err := suite.SDK.Auth.Authenticate("", "")
+	token, res, err := suite.SDK.Auth.Authenticate("", "")
 	require.Nil(suite.T(), err)
-	require.Equal(suite.T(), "faketoken", token)
+	require.Equal(suite.T(), "testtoken", token)
+	require.Equal(suite.T(), http.StatusOK, res.StatusCode)
 }
 
-func (suite *TestSuite) TestAuthenticateInvalidJSONBody() {
+func (suite *TestSuite) TestAuthenticate_withInvalidJSON() {
 	suite.Router.HandleFunc(defaultAuthBaseURL+"authenticate", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, `thisisnotjson`)
+		fmt.Fprint(w, `[1,2,3]`)
 	})
-	_, _, err := suite.SDK.Auth.Authenticate("", "")
+	_, res, err := suite.SDK.Auth.Authenticate("", "")
 	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusOK, res.StatusCode)
 }
 
-func (suite *TestSuite) TestAuthenticateAPIError() {
-	suite.Router.HandleFunc(defaultAuthBaseURL+"authenticate", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(400)
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, `{"message": "some api error", "code": 99}`)
-	})
-	_, _, err := suite.SDK.Auth.Authenticate("", "")
-	require.NotNil(suite.T(), err)
-}
-
-func (suite *TestSuite) TestAuthenticateInvalidAPIError() {
-	suite.Router.HandleFunc(defaultAuthBaseURL+"authenticate", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(400)
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, ``)
-	})
-	_, _, err := suite.SDK.Auth.Authenticate("", "")
-	require.NotNil(suite.T(), err)
-}
-
-func (suite *TestSuite) TestAuthenticateNetworkError() {
-	suite.Server.Close()
-	_, _, err := suite.SDK.Auth.Authenticate("", "")
-	require.NotNil(suite.T(), err)
-}
 func (suite *TestSuite) TestVerify() {
-	suite.Router.HandleFunc(defaultAuthBaseURL+"verify/{token}", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(defaultAuthBaseURL+"verify/testtoken", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `{"identity": {"username": "test", "email": "test@test.com", "display_name":"Test"}}`)
+		fmt.Fprint(w, `{"username": "test", "email":"test@test.com", "display_name": "Test"}`)
 	})
-	identity, _, err := suite.SDK.Auth.Verify("test")
+	user, resp, err := suite.SDK.Auth.Verify("testtoken")
 	require.Nil(suite.T(), err)
-	require.Equal(suite.T(), "test", identity.Username)
-	require.Equal(suite.T(), "test@test.com", identity.Email)
-	require.Equal(suite.T(), "Test", identity.DisplayName)
+	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
+	require.Equal(suite.T(), "test", user.GetUsername())
+	require.Equal(suite.T(), "test@test.com", user.GetEmail())
+	require.Equal(suite.T(), "Test", user.GetDisplayName())
 }
-
-func (suite *TestSuite) TestVerifyInvalidJSONBody() {
-	suite.Router.HandleFunc(defaultAuthBaseURL+"verify/{token}", func(w http.ResponseWriter, r *http.Request) {
+func (suite *TestSuite) TestVerify_withInvalidJSON() {
+	suite.Router.HandleFunc(defaultAuthBaseURL+"verify/testtoken", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `thisisnotjson`)
+		fmt.Fprint(w, `[1,2,3]`)
 	})
-	_, _, err := suite.SDK.Auth.Verify("testtoken")
+	_, resp, err := suite.SDK.Auth.Verify("testtoken")
 	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
 }
-func (suite *TestSuite) TestVerifyAPIError() {
-	suite.Router.HandleFunc(defaultAuthBaseURL+"verify/{token}", func(w http.ResponseWriter, r *http.Request) {
+func (suite *TestSuite) TestInvalidate() {
+	suite.Router.HandleFunc(defaultAuthBaseURL+"invalidate/testtoken", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(204)
+	})
+	resp, err := suite.SDK.Auth.Invalidate("testtoken")
+	require.Nil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusNoContent, resp.StatusCode)
+}
+func (suite *TestSuite) TestVerify_withBadInput() {
+	suite.Router.HandleFunc(defaultAuthBaseURL+"invalidate/testtoken", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `{"message": "some api error", "code": 99}`)
+		fmt.Fprint(w, `{"code": 99, "message": "test"}`)
 	})
-	_, _, err := suite.SDK.Auth.Verify("testtoken")
+	resp, err := suite.SDK.Auth.Invalidate("testtoken")
 	require.NotNil(suite.T(), err)
-}
-func (suite *TestSuite) TestVerifyInvalidAPIError() {
-	suite.Router.HandleFunc(defaultAuthBaseURL+"verify/{token}", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(400)
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `{{}}`)
-	})
-	_, _, err := suite.SDK.Auth.Verify("testtoken")
-	require.NotNil(suite.T(), err)
-}
-
-func (suite *TestSuite) TestVerifyNetworkError() {
-	suite.Server.Close()
-	_, _, err := suite.SDK.Auth.Verify("")
-	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusBadRequest, resp.StatusCode)
 }
