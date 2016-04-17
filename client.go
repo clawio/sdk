@@ -137,10 +137,19 @@ func CheckResponse(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		return nil
 	}
-	errorResponse := &codes.ErrorResponse{Response: r}
-	data, err := ioutil.ReadAll(r.Body)
-	if err == nil && data != nil {
-		json.Unmarshal(data, errorResponse)
+
+	errorResponse := &codes.ErrorResponse{Response: r, Err: &codes.Err{}}
+	if r.StatusCode == http.StatusBadRequest {
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			errorResponse.Err = codes.NewErr(codes.Internal, "")
+			return errorResponse
+		}
+		if e := json.Unmarshal(data, errorResponse.Err); e != nil {
+			errorResponse.Err = codes.NewErr(codes.Internal, "")
+		}
+		return errorResponse
 	}
+	errorResponse.Err = codes.NewErr(codes.Internal, "")
 	return errorResponse
 }
