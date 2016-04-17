@@ -15,7 +15,7 @@ type (
 	}
 
 	authService struct {
-		client  *Client
+		client  *client
 		baseURL string
 	}
 
@@ -35,12 +35,12 @@ func (s *authService) Authenticate(username, password string) (string, *codes.Re
 	authNRequest := &service.AuthenticateRequest{
 		Username: username,
 		Password: password}
-	req, err := s.client.NewRequest("POST", "authenticate", authNRequest)
+	req, err := s.client.newRequest("POST", "authenticate", authNRequest)
 	if err != nil {
 		return "", nil, err
 	}
 	authNResponse := &service.AuthenticateResponse{}
-	resp, err := s.client.Do(req, authNResponse, true)
+	resp, err := s.client.do(req, authNResponse, true)
 	if err != nil {
 		return "", resp, err
 	}
@@ -50,12 +50,12 @@ func (s *authService) Authenticate(username, password string) (string, *codes.Re
 // Verify verifies if an issued authn token is valid. If it is valid returns
 // the user obtained from it.
 func (s *authService) Verify(token string) (entities.User, *codes.Response, error) {
-	req, err := s.client.NewRequest("GET", "verify/"+token, nil)
+	req, err := s.client.newRequest("GET", "verify/"+token, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 	u := &user{}
-	resp, err := s.client.Do(req, u, true)
+	resp, err := s.client.do(req, u, true)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -64,11 +64,11 @@ func (s *authService) Verify(token string) (entities.User, *codes.Response, erro
 
 // Invalidate invalidates a token.
 func (s *authService) Invalidate(token string) (*codes.Response, error) {
-	req, err := s.client.NewRequest("DELETE", "invalidate/"+token, nil)
+	req, err := s.client.newRequest("DELETE", "invalidate/"+token, nil)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.client.Do(req, nil, true)
+	resp, err := s.client.do(req, nil, true)
 	if err != nil {
 		return resp, err
 	}

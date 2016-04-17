@@ -8,113 +8,113 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (suite *TestSuite) TestNewRequest() {
-	c := NewClient("", nil)
-	_, err := c.NewRequest("GET", "/", nil)
+func (suite *TestSuite) TestnewRequest() {
+	c := newClient("", nil)
+	_, err := c.newRequest("GET", "/", nil)
 	require.Nil(suite.T(), err)
 }
-func (suite *TestSuite) TestNewRequest_withBadURL() {
-	c := NewClient(":", nil)
-	_, err := c.NewRequest("GET", ":", nil)
+func (suite *TestSuite) TestnewRequest_withBadURL() {
+	c := newClient(":", nil)
+	_, err := c.newRequest("GET", ":", nil)
 	require.NotNil(suite.T(), err)
 }
 
-func (suite *TestSuite) TestNewRequest_withInvalidJSON() {
-	c := NewClient("", nil)
+func (suite *TestSuite) TestnewRequest_withInvalidJSON() {
+	c := newClient("", nil)
 	type T struct {
 		A map[int]interface{}
 	}
-	_, err := c.NewRequest("GET", "/", &T{})
+	_, err := c.newRequest("GET", "/", &T{})
 	require.NotNil(suite.T(), err)
 }
-func (suite *TestSuite) TestNewRequest_withBadMethod() {
-	c := NewClient("", nil)
-	_, err := c.NewRequest(":", "/", nil)
+func (suite *TestSuite) TestnewRequest_withBadMethod() {
+	c := newClient("", nil)
+	_, err := c.newRequest(":", "/", nil)
 	require.NotNil(suite.T(), err)
 }
 
-func (suite *TestSuite) TestNewRequest_withUserAgent() {
-	c := NewClient("", nil)
-	c.UserAgent = "custom"
-	r, err := c.NewRequest("GET", "/", nil)
+func (suite *TestSuite) TestnewRequest_withuserAgent() {
+	c := newClient("", nil)
+	c.userAgent = "custom"
+	r, err := c.newRequest("GET", "/", nil)
 	require.Nil(suite.T(), err)
 	require.Equal(suite.T(), r.Header.Get("user-agent"), "custom")
 }
 
-func (suite *TestSuite) TestNewUploadRequest_withUserAgent() {
-	c := NewClient("", nil)
-	c.UserAgent = "custom"
-	_, err := c.NewUploadRequest("/", nil)
+func (suite *TestSuite) TestnewUploadRequest_withuserAgent() {
+	c := newClient("", nil)
+	c.userAgent = "custom"
+	_, err := c.newUploadRequest("/", nil)
 	require.Nil(suite.T(), err)
 }
 
-func (suite *TestSuite) TestNewUploadRequest_withBadURL() {
-	c := NewClient("", nil)
-	c.UserAgent = "custom"
-	_, err := c.NewUploadRequest(":", nil)
+func (suite *TestSuite) TestnewUploadRequest_withBadURL() {
+	c := newClient("", nil)
+	c.userAgent = "custom"
+	_, err := c.newUploadRequest(":", nil)
 	require.NotNil(suite.T(), err)
 }
-func (suite *TestSuite) TestNewClient() {
-	c := NewClient("", nil)
-	c.UserAgent = "custom"
-	_, err := c.NewRequest("GET", "/", nil)
+func (suite *TestSuite) TestnewClient() {
+	c := newClient("", nil)
+	c.userAgent = "custom"
+	_, err := c.newRequest("GET", "/", nil)
 	require.Nil(suite.T(), err)
 }
 
-func (suite *TestSuite) TestDo_withClose() {
+func (suite *TestSuite) Testdo_withClose() {
 	suite.Router.HandleFunc("/dummy", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Write([]byte("1"))
 	})
-	c := NewClient("", nil)
-	req, err := c.NewRequest("GET", suite.Server.URL+"/dummy", nil)
+	c := newClient("", nil)
+	req, err := c.newRequest("GET", suite.Server.URL+"/dummy", nil)
 	require.Nil(suite.T(), err)
-	_, err = c.Do(req, nil, true)
+	_, err = c.do(req, nil, true)
 	require.Nil(suite.T(), err)
 }
-func (suite *TestSuite) TestDo_withWriter() {
+func (suite *TestSuite) Testdo_withWriter() {
 	suite.Router.HandleFunc("/dummy", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Write([]byte("1"))
 	})
 	buf := new(bytes.Buffer)
-	c := NewClient("", nil)
-	req, err := c.NewRequest("GET", suite.Server.URL+"/dummy", nil)
+	c := newClient("", nil)
+	req, err := c.newRequest("GET", suite.Server.URL+"/dummy", nil)
 	require.Nil(suite.T(), err)
-	_, err = c.Do(req, buf, false)
+	_, err = c.do(req, buf, false)
 	require.Nil(suite.T(), err)
 	data, err := ioutil.ReadAll(buf)
 	require.Nil(suite.T(), err)
 	require.Equal(suite.T(), "1", string(data))
 }
-func (suite *TestSuite) TestDo_withEmptyBody() {
+func (suite *TestSuite) Testdo_withEmptyBody() {
 	suite.Router.HandleFunc("/dummy", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 	})
-	c := NewClient("", nil)
-	req, err := c.NewRequest("GET", suite.Server.URL+"/dummy", nil)
+	c := newClient("", nil)
+	req, err := c.newRequest("GET", suite.Server.URL+"/dummy", nil)
 	require.Nil(suite.T(), err)
 	type T struct{}
 	t := &T{}
-	_, err = c.Do(req, t, false)
+	_, err = c.do(req, t, false)
 	require.Nil(suite.T(), err)
 }
 
-func (suite *TestSuite) TestDo_withError() {
-	c := NewClient("", nil)
-	req, err := c.NewRequest("GET", "", nil)
+func (suite *TestSuite) Testdo_withError() {
+	c := newClient("", nil)
+	req, err := c.newRequest("GET", "", nil)
 	require.Nil(suite.T(), err)
-	_, err = c.Do(req, nil, false)
+	_, err = c.do(req, nil, false)
 	require.NotNil(suite.T(), err)
 }
-func (suite *TestSuite) TestDo_withResponseError() {
+func (suite *TestSuite) Testdo_withResponseError() {
 	suite.Router.HandleFunc("/dummy", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		w.Write([]byte("1"))
 	})
-	c := NewClient("", nil)
-	req, err := c.NewRequest("GET", suite.Server.URL+"/dummy", nil)
+	c := newClient("", nil)
+	req, err := c.newRequest("GET", suite.Server.URL+"/dummy", nil)
 	require.Nil(suite.T(), err)
-	_, err = c.Do(req, nil, true)
+	_, err = c.do(req, nil, true)
 	require.NotNil(suite.T(), err)
 }

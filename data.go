@@ -14,17 +14,17 @@ type DataService interface {
 }
 
 type dataService struct {
-	client  *Client
+	client  *client
 	baseURL string
 }
 
 func (s *dataService) Upload(path string, r io.Reader, checksum string) (*codes.Response, error) {
 	path = p.Join("/", path)
-	req, err := s.client.NewUploadRequest("upload"+path, r)
+	req, err := s.client.newUploadRequest("upload"+path, r)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.client.Do(req, nil, true)
+	resp, err := s.client.do(req, nil, true)
 	if err != nil {
 		return resp, err
 	}
@@ -33,11 +33,11 @@ func (s *dataService) Upload(path string, r io.Reader, checksum string) (*codes.
 
 func (s *dataService) Download(path string) (io.Reader, *codes.Response, error) {
 	path = p.Join("/", path)
-	req, err := s.client.NewRequest("GET", "download"+path, nil)
+	req, err := s.client.newRequest("GET", "download"+path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
-	resp, err := s.client.Do(req, nil, false)
+	resp, err := s.client.do(req, nil, false)
 	if err != nil {
 		return nil, resp, err
 	}

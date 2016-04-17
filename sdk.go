@@ -19,7 +19,7 @@ type SDK struct {
 // New creates a new SDK.
 func New(urls *ServiceEndpoints, httpClient *http.Client) *SDK {
 	sdk := &SDK{}
-	sdk.Auth = &authService{client: NewClient(urls.AuthServiceBaseURL, httpClient)}
-	sdk.Data = &dataService{client: NewClient(urls.DataServiceBaseURL, httpClient)}
+	sdk.Auth = &authService{client: newClient(urls.AuthServiceBaseURL, httpClient)}
+	sdk.Data = &dataService{client: newClient(urls.DataServiceBaseURL, httpClient)}
 	return sdk
 }
