@@ -1,6 +1,8 @@
 package sdk
 
 import (
+	"path"
+
 	"github.com/clawio/authentication/service"
 	"github.com/clawio/codes"
 	"github.com/clawio/entities"
@@ -50,7 +52,8 @@ func (s *authService) Authenticate(username, password string) (string, *codes.Re
 // Verify verifies if an issued authn token is valid. If it is valid returns
 // the user obtained from it.
 func (s *authService) Verify(token string) (entities.User, *codes.Response, error) {
-	req, err := s.client.newRequest("GET", "verify/"+token, nil)
+	token = path.Join("/", token)
+	req, err := s.client.newRequest("GET", "verify"+token, nil)
 	if err != nil {
 		return nil, nil, err
 	}

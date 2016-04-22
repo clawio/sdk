@@ -2,15 +2,15 @@ package sdk
 
 import (
 	"io"
-	p "path"
+	"path"
 
 	"github.com/clawio/codes"
 )
 
 // DataService is the interface that specifies the methods to call a data service.
 type DataService interface {
-	Upload(path string, r io.Reader, checksum string) (*codes.Response, error)
-	Download(path string) (io.Reader, *codes.Response, error)
+	Upload(pathSpec string, r io.Reader, checksum string) (*codes.Response, error)
+	Download(pathSpec string) (io.Reader, *codes.Response, error)
 }
 
 type dataService struct {
@@ -18,9 +18,9 @@ type dataService struct {
 	baseURL string
 }
 
-func (s *dataService) Upload(path string, r io.Reader, checksum string) (*codes.Response, error) {
-	path = p.Join("/", path)
-	req, err := s.client.newUploadRequest("upload"+path, r)
+func (s *dataService) Upload(pathSpec string, r io.Reader, checksum string) (*codes.Response, error) {
+	pathSpec = path.Join("/", pathSpec)
+	req, err := s.client.newUploadRequest("upload"+pathSpec, r)
 	if err != nil {
 		return nil, err
 	}
@@ -31,9 +31,9 @@ func (s *dataService) Upload(path string, r io.Reader, checksum string) (*codes.
 	return resp, nil
 }
 
-func (s *dataService) Download(path string) (io.Reader, *codes.Response, error) {
-	path = p.Join("/", path)
-	req, err := s.client.newRequest("GET", "download"+path, nil)
+func (s *dataService) Download(pathSpec string) (io.Reader, *codes.Response, error) {
+	pathSpec = path.Join("/", pathSpec)
+	req, err := s.client.newRequest("GET", "download"+pathSpec, nil)
 	if err != nil {
 		return nil, nil, err
 	}

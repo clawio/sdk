@@ -38,6 +38,7 @@ func (c *client) newRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
+	// TODO(labkode) Check for trailing slash and allow it to access home directories
 	u := c.baseURL.ResolveReference(rel)
 
 	var buf io.ReadWriter
@@ -142,11 +143,11 @@ func checkResponse(r *http.Response) error {
 	if r.StatusCode == http.StatusBadRequest {
 		data, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			errorResponse.Err = codes.NewErr(codes.Internal, "")
+			errorResponse.Err = codes.NewErr(codes.Internal, "error reading body for errorResponse")
 			return errorResponse
 		}
 		if e := json.Unmarshal(data, errorResponse.Err); e != nil {
-			errorResponse.Err = codes.NewErr(codes.Internal, "")
+			errorResponse.Err = codes.NewErr(codes.Internal, "error response is not valid JSON")
 		}
 		return errorResponse
 	}

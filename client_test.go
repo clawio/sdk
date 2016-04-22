@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/stretchr/testify/require"
 )
@@ -116,5 +117,13 @@ func (suite *TestSuite) Testdo_withResponseError() {
 	req, err := c.newRequest("GET", suite.Server.URL+"/dummy", nil)
 	require.Nil(suite.T(), err)
 	_, err = c.do(req, nil, true)
+	require.NotNil(suite.T(), err)
+}
+
+func (suite *TestSuite) TestcheckResponse_withBadJSONBody() {
+	resp := &http.Response{}
+	resp.Body = ioutil.NopCloser(strings.NewReader("1"))
+	resp.StatusCode = http.StatusBadRequest
+	err := checkResponse(resp)
 	require.NotNil(suite.T(), err)
 }

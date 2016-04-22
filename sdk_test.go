@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	defaultBaseURL     = "/clawio/v1/"
-	defaultAuthBaseURL = defaultBaseURL + "auth/"
-	defaultDataBaseURL = defaultBaseURL + "data/"
+	defaultBaseURL         = "/clawio/v1/"
+	defaultAuthBaseURL     = defaultBaseURL + "auth/"
+	defaultDataBaseURL     = defaultBaseURL + "data/"
+	defaultMetaDataBaseURL = defaultBaseURL + "metadata/"
 )
 
 type TestSuite struct {
@@ -40,6 +41,7 @@ func (suite *TestSuite) SetupTest() {
 	urls := &ServiceEndpoints{}
 	urls.AuthServiceBaseURL = server.URL + defaultAuthBaseURL
 	urls.DataServiceBaseURL = server.URL + defaultDataBaseURL
+	urls.MetaDataServiceBaseURL = server.URL + defaultMetaDataBaseURL
 	httpClient := &http.Client{Transport: transport}
 	sdk := New(urls, httpClient)
 	suite.Router = router
@@ -55,6 +57,7 @@ func (suite *TestSuite) TestNew() {
 	urls := &ServiceEndpoints{}
 	urls.AuthServiceBaseURL = defaultAuthBaseURL
 	urls.DataServiceBaseURL = defaultBaseURL
+	urls.MetaDataServiceBaseURL = defaultBaseURL
 	sdk := New(urls, nil)
 	require.NotNil(suite.T(), sdk)
 }
