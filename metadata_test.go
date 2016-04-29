@@ -70,3 +70,35 @@ func (suite *TestSuite) TestListTree_withError() {
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), http.StatusBadRequest, resp.StatusCode)
 }
+func (suite *TestSuite) TestDeleteObject() {
+	suite.Router.HandleFunc(defaultMetaDataBaseURL+"delete/tree", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+	})
+	resp, err := suite.SDK.Meta.DeleteObject("tree")
+	require.Nil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
+}
+func (suite *TestSuite) TestDeleteObject_withError() {
+	suite.Router.HandleFunc(defaultMetaDataBaseURL+"delete/tree", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	resp, err := suite.SDK.Meta.DeleteObject("tree")
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusInternalServerError, resp.StatusCode)
+}
+func (suite *TestSuite) TestMoveObject() {
+	suite.Router.HandleFunc(defaultMetaDataBaseURL+"move/tree", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+	})
+	resp, err := suite.SDK.Meta.MoveObject("tree", "newtree")
+	require.Nil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
+}
+func (suite *TestSuite) TestMoveObject_withError() {
+	suite.Router.HandleFunc(defaultMetaDataBaseURL+"move/tree", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	resp, err := suite.SDK.Meta.MoveObject("tree", "newtree")
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusInternalServerError, resp.StatusCode)
+}

@@ -12,6 +12,8 @@ type MetaDataService interface {
 	Init() (*codes.Response, error)
 	ExamineObject(pathSpec string) (entities.ObjectInfo, *codes.Response, error)
 	ListTree(pathSpec string) ([]entities.ObjectInfo, *codes.Response, error)
+	DeleteObject(pathSpec string) (*codes.Response, error)
+	MoveObject(sourcePathSpec, targetPathSpec string) (*codes.Response, error)
 }
 
 type objectInfo struct {
@@ -75,4 +77,25 @@ func (s *metaDataService) ListTree(pathSpec string) ([]entities.ObjectInfo, *cod
 		oinfos = append(oinfos, info)
 	}
 	return oinfos, resp, nil
+}
+func (s *metaDataService) DeleteObject(pathSpec string) (*codes.Response, error) {
+	pathSpec = path.Join("/", pathSpec)
+	req, err := s.client.newRequest("DELETE", "delete"+pathSpec, nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.do(req, nil, true)
+}
+
+func (s *metaDataService) MoveObject(sourcePathSpec, targetPathSpec string) (*codes.Response, error) {
+	sourcePathSpec = path.Join("/", sourcePathSpec)
+	targetPathSpec = path.Join("/", targetPathSpec)
+	req, err := s.client.newRequest("POST", "move"+sourcePathSpec, nil)
+	if err != nil {
+		return nil, err
+	}
+	values := req.URL.Query()
+	values.Set("target", targetPathSpec)
+	req.URL.RawQuery = values.Encode()
+	return s.client.do(req, nil, true)
 }
