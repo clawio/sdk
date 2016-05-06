@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultBaseURL         = "/clawio/v1/"
+	defaultBaseURL         = "/api/"
 	defaultAuthBaseURL     = defaultBaseURL + "auth/"
 	defaultDataBaseURL     = defaultBaseURL + "data/"
 	defaultMetaDataBaseURL = defaultBaseURL + "metadata/"

@@ -34,12 +34,11 @@ func (suite *TestSuite) TestExamineObject() {
 	info, resp, err := suite.SDK.Meta.ExamineObject("myblob")
 	require.Nil(suite.T(), err)
 	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
-	require.Equal(suite.T(), "myblob", info.GetPathSpec())
-	fmt.Printf("%+v", info)
-	require.Equal(suite.T(), uint64(100), info.GetSize())
-	require.Equal(suite.T(), entities.ObjectType(1), info.GetType())
-	require.Equal(suite.T(), "", info.GetMimeType())
-	require.Equal(suite.T(), "", info.GetChecksum())
+	require.Equal(suite.T(), "myblob", info.PathSpec)
+	require.Equal(suite.T(), int(100), info.Size)
+	require.Equal(suite.T(), entities.ObjectType(1), info.Type)
+	require.Equal(suite.T(), "", info.MimeType)
+	require.Equal(suite.T(), "", info.Checksum)
 }
 func (suite *TestSuite) TestExamineObject_withError() {
 	suite.Router.HandleFunc(defaultMetaDataBaseURL+"examine/myblob", func(w http.ResponseWriter, r *http.Request) {
