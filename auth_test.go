@@ -11,7 +11,7 @@ func (suite *TestSuite) TestAuthenticate() {
 	suite.Router.HandleFunc(defaultAuthBaseURL+"authenticate", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `{"token":"testtoken"}`)
+		fmt.Fprint(w, `{"access_token":"testtoken"}`)
 	})
 	token, res, err := suite.SDK.Auth.Authenticate("", "")
 	require.Nil(suite.T(), err)

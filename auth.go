@@ -46,7 +46,7 @@ func (s *authService) Authenticate(username, password string) (string, *codes.Re
 	if err != nil {
 		return "", resp, err
 	}
-	return authNResponse.Token, resp, nil
+	return authNResponse.AccessToken, resp, nil
 }
 
 // Verify verifies if an issued authn token is valid. If it is valid returns
