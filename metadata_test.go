@@ -35,7 +35,7 @@ func (suite *TestSuite) TestExamineObject() {
 	require.Nil(suite.T(), err)
 	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
 	require.Equal(suite.T(), "myblob", info.PathSpec)
-	require.Equal(suite.T(), int(100), info.Size)
+	require.Equal(suite.T(), int64(100), info.Size)
 	require.Equal(suite.T(), entities.ObjectType(1), info.Type)
 	require.Equal(suite.T(), "", info.MimeType)
 	require.Equal(suite.T(), "", info.Checksum)
