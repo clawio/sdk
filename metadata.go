@@ -49,7 +49,7 @@ func (s *metaDataService) ExamineObject(pathSpec string) (*entities.ObjectInfo, 
 
 func (s *metaDataService) ListTree(pathSpec string) ([]*entities.ObjectInfo, *codes.Response, error) {
 	pathSpec = path.Join("/", pathSpec)
-	req, err := s.client.newRequest("GET", "listtree"+pathSpec, nil)
+	req, err := s.client.newRequest("GET", "list"+pathSpec, nil)
 	if err != nil {
 		return nil, nil, err
 	}
