@@ -8,8 +8,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	initURL    = defaultMetaDataBaseURL + "init"
+	examineURL = defaultMetaDataBaseURL + "examine/"
+	listURL    = defaultMetaDataBaseURL + "list/"
+	deleteURL  = defaultMetaDataBaseURL + "delete/"
+	moveURL    = defaultMetaDataBaseURL + "move/"
+)
+
 func (suite *TestSuite) TestInit() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"init", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(initURL, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 	})
 	resp, err := suite.SDK.Meta.Init()
@@ -17,7 +25,7 @@ func (suite *TestSuite) TestInit() {
 	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
 }
 func (suite *TestSuite) TestInit_withError() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"init", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(initURL, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		fmt.Fprint(w, `{"code":99, "message":""}`)
 	})
@@ -27,7 +35,7 @@ func (suite *TestSuite) TestInit_withError() {
 }
 
 func (suite *TestSuite) TestExamineObject() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"examine/myblob", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(examineURL+"myblob", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		fmt.Fprint(w, `{"pathspec":"myblob", "size": 100, "type": 1, "mime": "", "checksum": ""}`)
 	})
@@ -41,7 +49,7 @@ func (suite *TestSuite) TestExamineObject() {
 	require.Equal(suite.T(), "", info.Checksum)
 }
 func (suite *TestSuite) TestExamineObject_withError() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"examine/myblob", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(examineURL+"myblob", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		fmt.Fprint(w, `{"code":99, "message":""}`)
 	})
@@ -51,7 +59,7 @@ func (suite *TestSuite) TestExamineObject_withError() {
 }
 
 func (suite *TestSuite) TestListTree() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"listtree/tree", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(listURL+"tree", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		fmt.Fprint(w, `[{"pathspec":"myblob", "size": 100, "type": 1, "mime": "", "checksum": ""}]`)
 	})
@@ -61,7 +69,7 @@ func (suite *TestSuite) TestListTree() {
 	require.Equal(suite.T(), 1, len(infos))
 }
 func (suite *TestSuite) TestListTree_withError() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"listtree/tree", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(listURL+"tree", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		fmt.Fprint(w, `{"code":99, "message":""}`)
 	})
@@ -70,7 +78,7 @@ func (suite *TestSuite) TestListTree_withError() {
 	require.Equal(suite.T(), http.StatusBadRequest, resp.StatusCode)
 }
 func (suite *TestSuite) TestDeleteObject() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"delete/tree", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(deleteURL+"tree", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 	})
 	resp, err := suite.SDK.Meta.DeleteObject("tree")
@@ -78,7 +86,7 @@ func (suite *TestSuite) TestDeleteObject() {
 	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
 }
 func (suite *TestSuite) TestDeleteObject_withError() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"delete/tree", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(deleteURL+"tree", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	})
 	resp, err := suite.SDK.Meta.DeleteObject("tree")
@@ -86,7 +94,7 @@ func (suite *TestSuite) TestDeleteObject_withError() {
 	require.Equal(suite.T(), http.StatusInternalServerError, resp.StatusCode)
 }
 func (suite *TestSuite) TestMoveObject() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"move/tree", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(moveURL+"tree", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 	})
 	resp, err := suite.SDK.Meta.MoveObject("tree", "newtree")
@@ -94,7 +102,7 @@ func (suite *TestSuite) TestMoveObject() {
 	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
 }
 func (suite *TestSuite) TestMoveObject_withError() {
-	suite.Router.HandleFunc(defaultMetaDataBaseURL+"move/tree", func(w http.ResponseWriter, r *http.Request) {
+	suite.Router.HandleFunc(moveURL+"tree", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	})
 	resp, err := suite.SDK.Meta.MoveObject("tree", "newtree")
