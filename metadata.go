@@ -3,8 +3,8 @@ package sdk
 import (
 	"path"
 
-	"github.com/clawio/codes"
-	"github.com/clawio/entities"
+	"github.com/clawio/clawiod/codes"
+	"github.com/clawio/clawiod/entities"
 )
 
 // MetaDataService is the interface that specifies the methods to call a metaData service.

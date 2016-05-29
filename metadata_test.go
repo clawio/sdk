@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/clawio/entities"
+	"github.com/clawio/clawiod/entities"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,14 +37,14 @@ func (suite *TestSuite) TestInit_withError() {
 func (suite *TestSuite) TestExamineObject() {
 	suite.Router.HandleFunc(examineURL+"myblob", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-		fmt.Fprint(w, `{"pathspec":"myblob", "size": 100, "type": 1, "mime": "", "checksum": ""}`)
+		fmt.Fprint(w, `{"pathspec":"myblob", "size": 100, "type": "blob", "mime": "", "checksum": ""}`)
 	})
 	info, resp, err := suite.SDK.Meta.ExamineObject("myblob")
 	require.Nil(suite.T(), err)
 	require.Equal(suite.T(), http.StatusOK, resp.StatusCode)
 	require.Equal(suite.T(), "myblob", info.PathSpec)
 	require.Equal(suite.T(), int64(100), info.Size)
-	require.Equal(suite.T(), entities.ObjectType(1), info.Type)
+	require.Equal(suite.T(), entities.ObjectType("blob"), info.Type)
 	require.Equal(suite.T(), "", info.MimeType)
 	require.Equal(suite.T(), "", info.Checksum)
 }
@@ -61,7 +61,7 @@ func (suite *TestSuite) TestExamineObject_withError() {
 func (suite *TestSuite) TestListTree() {
 	suite.Router.HandleFunc(listURL+"tree", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-		fmt.Fprint(w, `[{"pathspec":"myblob", "size": 100, "type": 1, "mime": "", "checksum": ""}]`)
+		fmt.Fprint(w, `[{"pathspec":"myblob", "size": 100, "type": "blob", "mime": "", "checksum": ""}]`)
 	})
 	infos, resp, err := suite.SDK.Meta.ListTree("tree")
 	require.Nil(suite.T(), err)

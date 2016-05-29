@@ -1,12 +1,12 @@
 package sdk
 
 import (
-	"github.com/clawio/authentication/service"
-	"github.com/clawio/codes"
+	"github.com/clawio/clawiod/codes"
+	"github.com/clawio/clawiod/services/authentication"
 )
 
 type (
-	// AuthService is the interface that deals with the calls to an authentication service.
+	// AuthService is the interface that deals with the calls to an authentication authentication.
 	AuthService interface {
 		Authenticate(username, password string) (string, *codes.Response, error)
 	}
@@ -19,17 +19,17 @@ type (
 
 // Authenticate authenticates a user using a username and a password.
 func (s *authService) Authenticate(username, password string) (string, *codes.Response, error) {
-	authNRequest := &service.AuthenticateRequest{
+	tokenRequest := &authentication.TokenRequest{
 		Username: username,
 		Password: password}
-	req, err := s.client.newRequest("POST", "token", authNRequest)
+	req, err := s.client.newRequest("POST", "token", tokenRequest)
 	if err != nil {
 		return "", nil, err
 	}
-	authNResponse := &service.AuthenticateResponse{}
-	resp, err := s.client.do(req, authNResponse, true)
+	tokenResponse := &authentication.TokenResponse{}
+	resp, err := s.client.do(req, tokenResponse, true)
 	if err != nil {
 		return "", resp, err
 	}
-	return authNResponse.AccessToken, resp, nil
+	return tokenResponse.AccessToken, resp, nil
 }

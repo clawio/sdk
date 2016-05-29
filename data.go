@@ -4,7 +4,7 @@ import (
 	"io"
 	"path"
 
-	"github.com/clawio/codes"
+	"github.com/clawio/clawiod/codes"
 )
 
 // DataService is the interface that specifies the methods to call a data service.
