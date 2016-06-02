@@ -14,6 +14,7 @@ type MetaDataService interface {
 	ListTree(pathSpec string) ([]*entities.ObjectInfo, *codes.Response, error)
 	DeleteObject(pathSpec string) (*codes.Response, error)
 	MoveObject(sourcePathSpec, targetPathSpec string) (*codes.Response, error)
+	CreateTree(pathSpec string) (*codes.Response, error)
 }
 
 type metaDataService struct {
@@ -60,9 +61,19 @@ func (s *metaDataService) ListTree(pathSpec string) ([]*entities.ObjectInfo, *co
 	}
 	return oinfos, resp, nil
 }
+
 func (s *metaDataService) DeleteObject(pathSpec string) (*codes.Response, error) {
 	pathSpec = path.Join("/", pathSpec)
 	req, err := s.client.newRequest("DELETE", "delete"+pathSpec, nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.do(req, nil, true)
+}
+
+func (s *metaDataService) CreateTree(pathSpec string) (*codes.Response, error) {
+	pathSpec = path.Join("/", pathSpec)
+	req, err := s.client.newRequest("POST", "createtree"+pathSpec, nil)
 	if err != nil {
 		return nil, err
 	}

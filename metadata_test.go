@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	initURL    = defaultMetaDataBaseURL + "init"
-	examineURL = defaultMetaDataBaseURL + "examine/"
-	listURL    = defaultMetaDataBaseURL + "list/"
-	deleteURL  = defaultMetaDataBaseURL + "delete/"
-	moveURL    = defaultMetaDataBaseURL + "move/"
+	initURL       = defaultMetaDataBaseURL + "init"
+	examineURL    = defaultMetaDataBaseURL + "examine/"
+	listURL       = defaultMetaDataBaseURL + "list/"
+	deleteURL     = defaultMetaDataBaseURL + "delete/"
+	moveURL       = defaultMetaDataBaseURL + "move/"
+	createTreeURL = defaultMetaDataBaseURL + "createtree/"
 )
 
 func (suite *TestSuite) TestInit() {
@@ -90,6 +91,22 @@ func (suite *TestSuite) TestDeleteObject_withError() {
 		w.WriteHeader(http.StatusInternalServerError)
 	})
 	resp, err := suite.SDK.Meta.DeleteObject("tree")
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusInternalServerError, resp.StatusCode)
+}
+func (suite *TestSuite) TestCreateTree() {
+	suite.Router.HandleFunc(createTreeURL+"tree", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(201)
+	})
+	resp, err := suite.SDK.Meta.CreateTree("tree")
+	require.Nil(suite.T(), err)
+	require.Equal(suite.T(), http.StatusCreated, resp.StatusCode)
+}
+func (suite *TestSuite) TestCreateTree_withError() {
+	suite.Router.HandleFunc(createTreeURL+"tree", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	resp, err := suite.SDK.Meta.CreateTree("tree")
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), http.StatusInternalServerError, resp.StatusCode)
 }
