@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/clawio/codes"
+	"github.com/clawio/clawiod/codes"
 )
 
 // A client manages communication with the ClawIO API.

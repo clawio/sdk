@@ -3,13 +3,14 @@ package sdk
 import (
 	"path"
 
-	"github.com/clawio/codes"
-	"github.com/clawio/entities"
+	"github.com/clawio/clawiod/codes"
+	"github.com/clawio/clawiod/entities"
 )
 
 // MetaDataService is the interface that specifies the methods to call a metaData service.
 type MetaDataService interface {
 	Init() (*codes.Response, error)
+	CreateTree(pathSpec string) (*codes.Response, error)
 	ExamineObject(pathSpec string) (*entities.ObjectInfo, *codes.Response, error)
 	ListTree(pathSpec string) ([]*entities.ObjectInfo, *codes.Response, error)
 	DeleteObject(pathSpec string) (*codes.Response, error)
@@ -60,9 +61,19 @@ func (s *metaDataService) ListTree(pathSpec string) ([]*entities.ObjectInfo, *co
 	}
 	return oinfos, resp, nil
 }
+
 func (s *metaDataService) DeleteObject(pathSpec string) (*codes.Response, error) {
 	pathSpec = path.Join("/", pathSpec)
 	req, err := s.client.newRequest("DELETE", "delete"+pathSpec, nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.do(req, nil, true)
+}
+
+func (s *metaDataService) CreateTree(pathSpec string) (*codes.Response, error) {
+	pathSpec = path.Join("/", pathSpec)
+	req, err := s.client.newRequest("POST", "createtree"+pathSpec, nil)
 	if err != nil {
 		return nil, err
 	}
